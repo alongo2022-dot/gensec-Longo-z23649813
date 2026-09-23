@@ -1,0 +1,18 @@
+[
+  {
+    "term": "RAG",
+    "definition": "Retrieval-Augmented Generation: retrieve relevant documents then generate an answer with an LLM."
+  },
+  {
+    "term": "Prompt injection",
+    "definition": "An attack where user input overrides system instructions inside an LLM prompt."
+  },
+  {
+    "term": "Embedding",
+    "definition": "A numeric vector representation of text used for semantic similarity search."
+  },
+  {
+    "term": "Chroma",
+    "definition": "A local vector database commonly used with LangChain for storing document embeddings."
+  }
+]

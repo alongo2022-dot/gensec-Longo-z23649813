@@ -1,0 +1,15 @@
+Generative Security (GenSec) course notes
+
+Retrieval-Augmented Generation (RAG) combines a retriever over a document
+corpus with a generative LLM. Relevant chunks are fetched by embedding
+similarity and then passed to the model as context so answers stay grounded
+in source material instead of relying only on the model's training data.
+
+Common RAG pipeline steps:
+1. Load documents from many formats (HTML, PDF, TXT, JSON, Wikipedia, etc.)
+2. Split documents into overlapping chunks
+3. Embed chunks into a vector database such as Chroma
+4. At query time, embed the question, retrieve top-k chunks, and generate
+
+Homework 2 builds a NotebookLM-style service on top of the Lab 02.3 LangChain
+RAG examples, with additional pre-built document loaders.
