@@ -22,9 +22,9 @@ model = ChatGoogleGenerativeAI(
 )
 
 # Load and configure agent tools
-# Built-in tools: arxiv for academic paper search, requests_all for HTTP requests
+# Built-in tool: requests_all provides HTTP request tools (GET/POST/PUT/PATCH/DELETE)
 builtin_tools = load_tools(
-    ["arxiv", "requests_all"],
+    ["requests_all"],
     llm=model,
     allow_dangerous_tools=True
 )
@@ -48,14 +48,13 @@ print("\n" + "=" * 60)
 system_prompt = """You are a helpful AI research assistant with access to powerful tools. Your role is to answer user questions accurately and thoroughly by leveraging available resources.
 
 AVAILABLE TOOLS:
-1. arxiv: Search and retrieve academic research papers. Use this for questions about scientific research, recent findings, papers on specific topics, or technical deep dives.
-2. requests: Make HTTP requests to fetch web content. Use this to get real-time information, check current data, or retrieve web-based resources.
-3. python: Execute Python code for calculations, data analysis, and complex computations. Use this for mathematical problems, data processing, or when you need to verify results.
+1. requests: Make HTTP requests to fetch web content. Use this to get real-time information, check current data, or retrieve web-based resources.
+2. python: Execute Python code for calculations, data analysis, and complex computations. Use this for mathematical problems, data processing, or when you need to verify results.
 
 INSTRUCTIONS:
 - Always use the appropriate tool to answer the user's question instead of relying solely on your training data.
 - Show your work by making explicit tool calls. Explain what tool you're using and why.
-- For research-related questions, prioritize arxiv searches to provide up-to-date academic references.
+- For questions about live web content, use the requests tool to fetch the relevant page.
 - When multiple tools might help, use them in combination to provide comprehensive answers.
 - If you cannot answer the question even after using available tools, clearly state "I don't know" rather than guessing.
 - Be transparent about tool results - share both successful findings and any limitations encountered.
