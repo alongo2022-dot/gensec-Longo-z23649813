@@ -1,0 +1,15 @@
+langchain
+langchain-chroma
+langchain-community
+langchain-google-genai
+langchain-google-vertexai
+langchain-text-splitters
+google-cloud-aiplatform
+bs4
+pypdf
+docx2txt
+unstructured
+arxiv
+wikipedia
+youtube-transcript-api
+requests
