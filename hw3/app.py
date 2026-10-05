@@ -7,9 +7,9 @@ The agent uses environment variables for configuration to avoid hardcoding sensi
 
 import os
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_community.tools import load_tools
+from langchain_community.agent_toolkits.load_tools import load_tools
 from langchain_experimental.tools import PythonREPLTool
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent
 
 # Read configuration from environment variables
 google_api_key = os.getenv("GOOGLE_API_KEY")
@@ -45,11 +45,23 @@ for tool in tools:
 print("\n" + "=" * 60)
 
 # Create the agent with a system prompt
-system_prompt = """You are a helpful AI assistant with access to various tools.
-You can search academic papers using arxiv, make HTTP requests, and execute Python code.
-Please use these tools to help answer user questions accurately and thoroughly."""
+system_prompt = """You are a helpful AI research assistant with access to powerful tools. Your role is to answer user questions accurately and thoroughly by leveraging available resources.
 
-agent = create_react_agent(
+AVAILABLE TOOLS:
+1. arxiv: Search and retrieve academic research papers. Use this for questions about scientific research, recent findings, papers on specific topics, or technical deep dives.
+2. requests: Make HTTP requests to fetch web content. Use this to get real-time information, check current data, or retrieve web-based resources.
+3. python: Execute Python code for calculations, data analysis, and complex computations. Use this for mathematical problems, data processing, or when you need to verify results.
+
+INSTRUCTIONS:
+- Always use the appropriate tool to answer the user's question instead of relying solely on your training data.
+- Show your work by making explicit tool calls. Explain what tool you're using and why.
+- For research-related questions, prioritize arxiv searches to provide up-to-date academic references.
+- When multiple tools might help, use them in combination to provide comprehensive answers.
+- If you cannot answer the question even after using available tools, clearly state "I don't know" rather than guessing.
+- Be transparent about tool results - share both successful findings and any limitations encountered.
+- Always cite sources when referencing papers or web content found through tools."""
+
+agent = create_agent(
     model=model,
     tools=tools,
     system_prompt=system_prompt
@@ -82,32 +94,23 @@ def run_agent_interactive():
             print(f"\n🔄 Processing: {user_input}\n")
             
             # Stream agent steps and tool calls
-            for step in agent.stream({"messages": [("user", user_input)]}):
-                # Detect and print tool calls from the agent
-                if "agent" in step:
-                    agent_step = step["agent"]
-                    if "messages" in agent_step:
-                        for msg in agent_step["messages"]:
-                            # Check for tool calls in message content
-                            if hasattr(msg, "tool_calls") and msg.tool_calls:
-                                for tool_call in msg.tool_calls:
-                                    print(f"🔧 Tool Call: {tool_call['name']}")
-                                    print(f"   Arguments: {tool_call['args']}")
-                
+            for step in agent.stream({"messages": [{"role": "user", "content": user_input}]}):
+                # Detect and print model output and tool calls
+                if "model" in step:
+                    for msg in step["model"]["messages"]:
+                        # Print any textual content (may be the final answer)
+                        if getattr(msg, "content", None):
+                            print(f"\n🤖 Agent: {msg.content}\n")
+                        # Print any tool calls the model requested
+                        if getattr(msg, "tool_calls", None):
+                            for tool_call in msg.tool_calls:
+                                print(f"🔧 Tool Call: {tool_call['name']}")
+                                print(f"   Arguments: {tool_call['args']}")
+
                 # Detect and print tool results
                 if "tools" in step:
-                    tool_step = step["tools"]
-                    if "messages" in tool_step:
-                        for msg in tool_step["messages"]:
-                            print(f"📋 Tool Result: {msg.content[:200]}...")
-                
-                # Print final agent response
-                if "agent" in step:
-                    agent_step = step["agent"]
-                    if "messages" in agent_step:
-                        for msg in agent_step["messages"]:
-                            if hasattr(msg, "content") and not hasattr(msg, "tool_calls"):
-                                print(f"\n🤖 Agent: {msg.content}\n")
+                    for msg in step["tools"]["messages"]:
+                        print(f"📋 Tool Result: {str(msg.content)[:200]}...")
         
         except KeyboardInterrupt:
             print("\n\n⚠️  Interrupted by user.")
