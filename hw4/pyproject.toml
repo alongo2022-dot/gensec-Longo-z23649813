@@ -1,0 +1,8 @@
+[project]
+name = "hw4"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "mcp>=2.3.0",
+    "mcp-server-time>=2026.10.19",
+]
