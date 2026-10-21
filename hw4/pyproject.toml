@@ -3,6 +3,8 @@ name = "hw4"
 version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = [
+    "langchain[mcp]>=1.4.3",
+    "langchain-google-genai>=4.4.0",
     "mcp>=2.3.0",
     "mcp-server-time>=2026.10.19",
 ]
